@@ -1,4 +1,4 @@
-# Serverless - Data Tranform
+# Serverless - Data Transform
 
 Serverless application that processes the data streams with S3 and Lambda.
 Data is stored on outbound S3 bucket, when a new object is created/uploaded the Lambda is triggered. Lambda retrieves the object and process it, once processing is done the new object is uploaded to the inbound S3 bucket.
@@ -29,7 +29,7 @@ Future Extentions:
 ----- once data is processed SNS could be used to notify the users about it
 
 ## Acrhiturecture Diagram
-![Architecture](images/sys-monitor-demo.gif)
+![Architecture](images/DATA-TRANSFER.JPG)
 
 ## Installing dependencies
 - Python 3.x
