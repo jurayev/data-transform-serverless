@@ -21,7 +21,7 @@ provider:
   stage: ${opt:stage, 'local'}
   deploymentPrefix: aws-lambda
   deploymentBucket: # when using localstack its important that before you deploy your lambda your s3 bucket already exists 
-                    # you can do this automatically via added your aws cli create bucket commands to the localstack-entrypoint.sh script
+                    # you can do this automatically via added your aws cli create bucket commands to the create-bucket.sh script
     name: ${self:service}-${opt:stage}-deploy
     
 package:
