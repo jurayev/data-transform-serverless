@@ -28,7 +28,7 @@ Future Extentions:
 
 ----- once data is processed SNS could be used to notify the users about it
 
-## Acrhiturecture Diagram
+## Architecture Diagram
 ![Architecture](images/DATA-TRANSFER.JPG)
 
 ## Installing dependencies
@@ -45,21 +45,23 @@ Future Extentions:
 https://github.com/localstack/localstack
 
 ## Set important env variables
-I do not use `aws configure` for simplicity sake. Instead variable are set using `export` by shell script
+I do not use `aws configure` for simplicity sake. Instead variable are set using `export` by shell script in `scripts/set-vars.sh`
 
 Two required variables are below:
 
 `export LOCALSTACK_HOSTNAME=localhost`  - For local machine use
 
-`export LOCALSTACK_REMOTE=172.17.0.2`   - For docker container use
+`export LOCALSTACK_REMOTE=<localstack ip address>`   - For docker container use
 
-`172.17.0.2` is default ip that is assigned to localstack instance in bridge network type. In order to reach the localstack instance the ip has to be set correctly in env variables.
-Make sure that this is correct ip by checking the assigned ip with the following command `docker network inspect bridge`. The localstack instance ip will be displayed if it is currently up and running. This behavior has to be improved by obtaining the dynamic ip of locastack.
+In order to reach the localstack instance the ip has to be set correctly in env variables.
+Make sure that the correct ip is set by checking the assigned ip with the following command `docker network inspect bridge`. The localstack instance ip will be displayed if it is currently up and running. This behavior has to be improved by obtaining the dynamic ip of locastack via docker compose with `- LOCALSTACK_HOSTNAME=${LOCALSTACK_REMOTE:-host.docker.internal}` config
 
 ## Running Application:
 1. Execute the full CI/CD like pipeline. Two containers are created: 1. Localstack AWS 2. App - that executes the tests and deploys the applicaton code and invokes a test lambda function
 
 `docker-compose up`
+
+Note: when running the first time ever, it takes a while to download all images: locastack, python:3.8-alpine, lambci/lambda. The first lambda function call will be slow as well, as it needs to download am image for lambda
 
 2. Run App in standby mode for manual testing.
 - Build the image
@@ -67,7 +69,9 @@ Make sure that this is correct ip by checking the assigned ip with the following
 `docker build -f Dockerfile.manual.test .`
 - Starts the container and runs the basic setup scripts
 
-`docker run --rm --env LOCALSTACK_HOSTNAME=$LOCALSTACK_REMOTE -p 9001:8080 <image_id>`
+`docker run --rm --env LOCALSTACK_HOSTNAME=<localstack ip address> -p 9001:8080 <image_id>`
+
+Where `<localstack ip address>` is ip address of localstack container
 - To run some manual tests, login to the docker
 
 `docker exec -it <container_id> /bin/sh`
