@@ -91,6 +91,9 @@ chmod +x scripts/deploy.sh
 chmod +x scripts/invoke.sh
 . scripts/invoke.sh
 ```
+- Verify processed file by downloading it for S3
+
+`aws --endpoint-url=$AWS_ENDPOINT s3api get-object --bucket json-data --key data1.json data1.json`
 - For tests:
 
 `python3 -m pytest`
