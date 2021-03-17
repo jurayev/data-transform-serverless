@@ -29,8 +29,10 @@ Future Extentions:
 ----- once data is processed SNS could be used to notify the users about it
 
 ## Architecture Diagram
+### Version 1
 ![Architecture](images/DATA-TRANSFER.JPG)
-
+### Version 2
+![Architecture V2](images/DATA-TRANSFER-V2.JPG)
 ## Installing dependencies
 - Python 3.x
 - Pip
