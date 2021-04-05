@@ -28,19 +28,6 @@ Future Extensions:
 
 ----- once data is processed SNS could be used to notify the users about it
 
-TODO:
-
-1. Use DynamoDB to store metadata, rules
-2. FE with react-create-app hosted on S3  -> axios of fetchapi calls /upload endpoint ->
-2.1. presigned post -> upload file using post
-3. Connect FE via GATEWAY with S3
-4. finish upload logic
-5. test uploader
-6. make copy project data-transform-serverless
-7. clean up resources and test build, docker
-8. Move serverless to the root
-9. experiment with lambda layers
-
 ## Architecture Diagram
 ### Version 1
 ![Architecture](images/DATA-TRANSFER.JPG)
@@ -100,8 +87,10 @@ Set env variable to make sure everything in place
 `aws --endpoint-url=$AWS_ENDPOINT s3 cp app/data s3://xml-data --recursive`
 
 - Make post request via GATEWAY using a tool like `curl`
-<api id> `aws --endpoint-url=$AWS_ENDPOINT --region=$AWS_REGION apigateway get-rest-apis`
-`curl -X POST "$AWS_ENDPOINT/restapis/<api id>/local/_user_request_/upload?file=data/data.xml&bucket=xml-data"`
+
+get api_id `aws --endpoint-url=$AWS_ENDPOINT --region=$AWS_REGION apigateway get-rest-apis`
+
+`curl -X POST "$AWS_ENDPOINT/restapis/<api_id>/local/_user_request_/upload?file=data/data.xml&bucket=xml-data"`
 
 - Also, it is possible to invoke the lambda manually. See scripts folder for details
 ```
@@ -115,4 +104,5 @@ chmod +x scripts/invoke-lambda.sh
 - For tests:
 
 `python3 -m pytest`
+
 - Stop the container once done
