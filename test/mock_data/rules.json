@@ -1,0 +1,19 @@
+[
+  { "RuleId": 1,
+    "NameMapping": {"items": "products",
+                    "id": "product_id",
+                    "category": "product_category",
+                    "description": "product_description",
+                    "images": "product_images",
+                    "url": "image"
+                    },
+   "TypeMapping": {"items": {"type": [], "depth_level": 1},
+                    "images": {"type": {}, "depth_level": 2},
+                    "prices": {"type": [], "depth_level": 2}
+                    },
+   "ignore":     {"@xmlns":  true,
+                  "@type":  true
+                  },
+   "namespaces": {"http://www.w3.org/TR/html4/": null}
+  }
+]

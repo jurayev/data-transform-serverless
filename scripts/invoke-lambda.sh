@@ -6,9 +6,5 @@ set -o nounset
 chmod +x scripts/set-vars.sh
 . scripts/set-vars.sh
 cd app
-# Local env
-serverless deploy --verbose --stage local --force
-
-# Prod env
-# serverless deploy --stage production
+serverless invoke --function process --log --stage local --region eu-central-1 --path events/s3-put-event.json
 cd ..

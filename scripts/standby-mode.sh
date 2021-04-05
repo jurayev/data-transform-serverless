@@ -23,12 +23,10 @@ echo "INFO: 5. Deploy serverless"
 chmod +x scripts/deploy.sh
 . scripts/deploy.sh
 
-echo "INFO: 6. Uploading some files to s3 that triggers lambdas"
-chmod +x scripts/upload-data-s3.sh
-. scripts/upload-data-s3.sh
+echo "INFO: 6. Runing container in standby mode until terminated"
+while true; do
+  echo "Running Docker"
+  sleep 5
+done
 
-echo "INFO: 7. Cleaning up resources"
-chmod +x scripts/cleanup.sh
-. scripts/cleanup.sh
-
-echo "INFO: COMPLETED PIPELINE"
+echo "INFO: TERMINATED"

@@ -1,0 +1,3 @@
+outboundBucket: xml-data
+inboundBucket: json-data
+region: eu-central-1

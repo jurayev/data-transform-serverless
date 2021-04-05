@@ -35,6 +35,7 @@ RAW_DICT = {
             }
         }
     }
+
 FORMATTED_DICT = {
     "products": [
         {
@@ -58,6 +59,7 @@ FORMATTED_DICT = {
         }
     ]
 }
+
 FORMATTED_DICT_TWO_PRODUCTS = {
     "products": [
         [
@@ -108,20 +110,19 @@ FORMATTED_DICT_TWO_PRODUCTS = {
     ]
 }
 
-
-RULES = {"name mapping": {  "items": "products",
-                            "id": "product_id",
-                            "category": "procduct_category",
-                            "description": "product_description",
-                            "images": "product_images",
-                            "url": "image"
-                            },
-        "type mapping": {  "items": {"type": [], "depth_level": 1},
-                            "images": {"type": {}, "depth_level": 2},
-                            "prices": {"type": [], "depth_level": 2}
-                            },
-        "ignore": {"@xmlns", "@type"},
-        "namespaces": {
-            'http://www.w3.org/TR/html4/': None
-        }
-    }
+RULES = {"NameMapping": {"items": "products",
+                          "id": "product_id",
+                          "category": "procduct_category",
+                          "description": "product_description",
+                          "images": "product_images",
+                          "url": "image"
+                          },
+         "TypeMapping": {"items": {"type": [], "depth_level": 1},
+                          "images": {"type": {}, "depth_level": 2},
+                          "prices": {"type": [], "depth_level": 2}
+                          },
+         "ignore": {"@xmlns", "@type"},
+         "namespaces": {
+             'http://www.w3.org/TR/html4/': None
+         }
+         }

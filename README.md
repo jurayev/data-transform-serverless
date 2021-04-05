@@ -1,32 +1,45 @@
 # Serverless - Data Transform
 
-Serverless application that processes the data streams with S3 and Lambda.
-Data is stored on outbound S3 bucket, when a new object is created/uploaded the Lambda is triggered. Lambda retrieves the object and process it, once processing is done the new object is uploaded to the inbound S3 bucket.
+Serverless application that processes the data streams with S3, Dynamo DB and Lambda.
+Data is stored on outbound S3 bucket, when a new object is created/uploaded/modified the Lambda is triggered. Lambda retrieves the object and process it, once processing is done the new object is uploaded to the inbound S3 bucket.
 
 Processing is performed as follows:
-XML files are converted to dictonary object, the data is processed according to the tranformation rules, then the data is converted to JSON format
+XML files are converted to dictionary object, the data is processed according to the transformation rules, then the data is converted to JSON format
 
-Assumptions:
+System Requirements:
 
 ----- the average file size is 2-3 MB, so this data can be loaded in memory and processed easily as nowadays lambdas could have up 10 GB RAM
+
+----- user can upload a file for transformation using `POST` request calling `/upload` API GATEWAY endpoint
 
 ----- xml files/data are validated before saving to S3 or some other service does this job
 
 ----- transformation rules are defined by the customer or some other service does this job
 
------ the rules are stored as key:value objects in NoSQL storage or in S3 as a json file
+----- transformation rules are stored as key:value objects in Dynamo DB and accessed by rule id
 
-Future Extentions:
+Future Extensions:
 
------ this architecture is able to handle any load as Lambdas are auto-scaled and can process async requests(Only AWS lambda hardware limits apply)
+----- this architecture is able to handle any load as Lambdas are auto-scaled and can process async requests(Only AWS lambda hardware limits apply ~ 100 concurrent threads)
 
------ if traffic is too high SQS could be used to queue rate limited requests
+----- if traffic is too high SQS could be used to queue rate limited requests and lambda limits could be increased
 
 ----- UI should be added for users to upload their data without interacting with S3
 
------ API Gateway would route requests
-
 ----- once data is processed SNS could be used to notify the users about it
+
+TODO:
+
+1. Use DynamoDB to store metadata, rules
+2. FE with react-create-app hosted on S3  -> axios of fetchapi calls /upload endpoint ->
+2.1. presigned post -> upload file using post
+3. Connect FE via GATEWAY with S3
+4. finish upload logic
+5. test uploader
+6. make copy project data-transform-serverless
+7. clean up resources and test build, docker
+8. Move serverless to the root
+9. experiment with lambda layers
 
 ## Architecture Diagram
 ### Version 1
@@ -63,12 +76,12 @@ Make sure that the correct ip is set by checking the assigned ip with the follow
 
 `docker-compose up`
 
-Note: when running the first time ever, it takes a while to download all images: locastack, python:3.8-alpine, lambci/lambda. The first lambda function call will be slow as well, as it needs to download am image for lambda
+Note: when running the first time ever, it takes a while to download all images: localstack, python:3.8-alpine, lambci/lambda. The first lambda function call will be slow as well, as it needs to download an image for lambda
 
 2. Run App in standby mode for manual testing.
 - Build the image
 
-`docker build -f Dockerfile.manual.test .`
+`docker build -t serverless-test -f Dockerfile.test .`
 - Starts the container and runs the basic setup scripts
 
 `docker run --rm --env LOCALSTACK_HOSTNAME=<localstack ip address> -p 9001:8080 <image_id>`
@@ -84,18 +97,21 @@ Set env variable to make sure everything in place
 
 - Put some objects to the bucket that triggers the lambda by `s3:ObjectCreated` event. 3 Lambda containers should be run in parallel
 
-`aws --endpoint-url=$AWS_ENDPOINT s3 cp src/data s3://xml-data --recursive`
+`aws --endpoint-url=$AWS_ENDPOINT s3 cp app/data s3://xml-data --recursive`
+
+- Make post request via GATEWAY using a tool like `curl`
+<api id> `aws --endpoint-url=$AWS_ENDPOINT --region=$AWS_REGION apigateway get-rest-apis`
+`curl -X POST "$AWS_ENDPOINT/restapis/<api id>/local/_user_request_/upload?file=data/data.xml&bucket=xml-data"`
+
 - Also, it is possible to invoke the lambda manually. See scripts folder for details
 ```
-chmod +x scripts/deploy.sh
-. scripts/deploy.sh
-
-chmod +x scripts/invoke.sh
-. scripts/invoke.sh
+chmod +x scripts/invoke-lambda.sh
+. scripts/invoke-lambda.sh
 ```
-- Verify processed file by downloading it for S3
+- Verify processed file by downloading it from S3
 
-`aws --endpoint-url=$AWS_ENDPOINT s3api get-object --bucket json-data --key data1.json data1.json`
+`aws --endpoint-url=$AWS_ENDPOINT s3api get-object --bucket json-data --key data.json data.json`
+
 - For tests:
 
 `python3 -m pytest`

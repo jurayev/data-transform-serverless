@@ -9,16 +9,17 @@ RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit
 
 RUN npm install -g serverless
 RUN npm install serverless-localstack
-RUN mkdir -p /usr/src/data-transform-serverless
-WORKDIR /usr/src/data-transform-serverless
+RUN npm install serverless-deployment-bucket --save-dev
+RUN mkdir -p /usr/data-transform-serverless
+WORKDIR /usr/data-transform-serverless
 
 COPY requirements.txt .
 COPY scripts ./scripts
-COPY src ./src
+COPY app ./app
 COPY test ./test
 
 # install dependencies
 RUN pip install -r requirements.txt
 
 RUN chmod +x scripts/execute-pipeline.sh
-CMD waitforit -address=http://$LOCALSTACK_HOSTNAME:4566 -timeout=120 -- echo "STARTING PIPELINE" && . scripts/execute-pipeline.sh
+CMD waitforit -address=http://$LOCALSTACK_HOSTNAME:4566 -timeout=120 -- echo "INFO: RUNNING PIPELINE" && . scripts/execute-pipeline.sh

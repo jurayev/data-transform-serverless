@@ -1,0 +1,107 @@
+
+service: data-transform
+
+plugins:
+  - serverless-localstack
+  - serverless-deployment-bucket
+
+custom:
+  localstack:
+    host: http://${env:LOCALSTACK_HOSTNAME, 'localhost'}
+    stages:
+      - local
+  stages:
+    - local
+    - prod
+
+provider:
+  apiGateway:
+    shouldStartNameWithService: true
+    binaryMediaTypes:
+      - '*/*'
+  name: aws
+  lambdaHashingVersion: 20201221
+  runtime: python3.8
+  region: ${file(config.${opt:stage, 'local'}.yml):region, 'eu-central-1'}
+  stage: ${opt:stage, 'local'}
+  deploymentPrefix: aws-lambda
+  deploymentBucket:
+    name: ${self:service}-${opt:stage, 'local'}-deploy
+    serverSideEncryption: AES256
+  environment:
+    AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID, 'test'}
+    AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY, 'test'}
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+            - s3:ListBucket
+          Resource: "arn:aws:s3:::*"
+
+  s3:
+    outboundBucket:
+      name: ${file(config.${opt:stage, 'local'}.yml):outboundBucket, 'xml-data'}
+    inboundBucket:
+      name: ${file(config.${opt:stage, 'local'}.yml):inboundBucket, 'json-data'}
+
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+    - venv/**
+    - .pytest_cache/**
+    - test/*
+
+functions:
+  process:
+    handler: src/data_processor.process
+    events:
+      - s3:
+          bucket: ${self:provider.s3.outboundBucket.name}
+          event: s3:ObjectCreated:*
+          rules:
+            # - prefix: *
+            - suffix: .xml
+          # existing: true # you can use up to 1 existing buckets per function
+
+  upload:
+    handler: src/uploader.upload
+    events:
+      - http:
+          path: upload # upload/{file_id}/{bucket_id} - path params
+          method: post
+          cors: true
+          request:
+            contentHandling: CONVERT_TO_BINARY
+          response:
+            contentHandling: CONVERT_TO_TEXT
+
+resources:
+  Resources:
+    inboundBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.s3.inboundBucket.name}
+    deploymentBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${opt:stage}-deploy
+
+    rulesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: rulesTable
+        AttributeDefinitions:
+          - AttributeName: RuleId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: RuleId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 5
