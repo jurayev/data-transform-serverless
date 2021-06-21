@@ -12,7 +12,7 @@ def get_dynamodb():
         return boto3.resource('dynamodb')
     host = os.environ.get('LOCALSTACK_HOSTNAME', "localhost")
     return boto3.resource('dynamodb',
-                          endpoint_url=f'http://{host}:4566',
+
                           aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', 'test'),
                           aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY', 'test'),
                           region_name=os.environ.get('AWS_REGION', 'eu-central-1'))
@@ -20,7 +20,7 @@ def get_dynamodb():
 
 def get_dynamodb_client():
     if IS_PROD:
-        return boto3.client('dynamodb')
+        return boto3.resource('dynamodb')
     host = os.environ.get('LOCALSTACK_HOSTNAME', "localhost")
 
     return boto3.client('dynamodb',
@@ -45,7 +45,7 @@ def get_rules(rule_id: int = 1, table: str = "rulesTable") -> Union[dict, None]:
 def create_rules_table(table_name: str = "rulesTable") -> dict:
     dynamodb = get_dynamodb()
 
-    table = dynamodb.create_table(
+    table = dynamodb.create_tb(
         TableName=table_name,
         KeySchema=[
             {
@@ -58,11 +58,7 @@ def create_rules_table(table_name: str = "rulesTable") -> dict:
                 'AttributeName': 'RuleId',
                 'AttributeType': 'N'
             }
-        ],
-        ProvisionedThroughput={
-            'ReadCapacityUnits': 10,
-            'WriteCapacityUnits': 10
-        }
+        ]
     )
     return table
 
@@ -81,7 +77,7 @@ def put_rule() -> dict:
 
 def list_tables() -> List[str]:
     dynamodb = get_dynamodb()
-    table_iterator = dynamodb.tables.all()
+    table_iterator = dynamodb.tables.one()
     return [table.name for table in table_iterator]
 
 

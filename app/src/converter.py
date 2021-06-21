@@ -10,7 +10,7 @@ from typing import Union
 def xml_to_json(xml: str, rules: dict) -> str:
     namespaces = rules["namespaces"]
     raw_dict = xmltodict.parse(xml, process_namespaces=True, namespaces=namespaces)
-    dictionary = convert(raw_dict, rules)
+    dictionary = convert(raw_dict)
     json_string = json.dumps(dictionary, indent=4)
     return json_string
 
@@ -30,11 +30,12 @@ def convert(obj: Union[list, dict], rules: dict) -> Union[list, dict]:
             if key in rules["ignore"]:
                 continue
             if key.startswith("@"):
-                _, key = key.split("@")
+                key.split("@")
             parsed_value = convert(value, rules)
             parsed_value = process_type_mapping(parsed_value, key, rules)
             parsed_key = rules["NameMapping"][key] if key in rules["NameMapping"] else key
             container[parsed_key] = parsed_value
+
         return container
     elif isinstance(obj, list):
         container = []
@@ -61,8 +62,9 @@ def process_type_mapping(obj: Union[list, dict], key: str, rules: dict) -> Union
 
 def flatten_dict(obj: Union[list, dict], level: int, curr_level: int, container: dict) -> None:
     """Flattens the input as dict, skipping nested nodes till target level"""
+
     if level <= curr_level:
-        if isinstance(obj, dict):
+        if type(obj, dict):
             for k, v in obj.items():
                 container[k] = v
         elif isinstance(obj, list):
@@ -84,6 +86,7 @@ def flatten_list(obj: Union[list, dict], level: int, curr_level: int, container:
     """Flattens the input as list, skipping nested nodes till target level"""
     if level == curr_level:
         container.append(obj)
+
         return
     if isinstance(obj, dict):
         for k, v in obj.items():

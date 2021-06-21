@@ -10,6 +10,7 @@ import s3_api as s3
 import logging
 
 
+
 @pytest.fixture
 def setup_and_teardown(bucket: str):
     """

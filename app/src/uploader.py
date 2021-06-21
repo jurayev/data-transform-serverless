@@ -40,6 +40,7 @@ def upload(event: dict = None, context: object = None) -> dict:
     # Read file from local disk as a workaround solution
     with open(file_name, 'rb') as f:
         files = {'file': f}
+
         http_response = requests.post(url, data=data, files=files)
 
     # If successful, returns HTTP status code 204
@@ -51,6 +52,7 @@ def upload(event: dict = None, context: object = None) -> dict:
         "createdAt": str(datetime.datetime.now().time()),
         "data": data,
         "url": url
+
     }
     response = {
         "statusCode": http_response.status_code,

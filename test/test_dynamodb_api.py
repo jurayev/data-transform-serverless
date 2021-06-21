@@ -61,3 +61,4 @@ def test_get_rules(prepare_db):
 
     assert rules["RuleId"] == 1
     assert expected_rules == rules
+

@@ -11,6 +11,7 @@ def get_s3_client(region: str = None):
     if IS_PROD:
         return boto3.client('s3')
     host = os.environ.get('LOCALSTACK_HOSTNAME', "localhost")
+
     return boto3.client('s3',
                         endpoint_url=f'http://{host}:4566',
                         aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', 'test'),
@@ -22,7 +23,7 @@ def create_bucket(bucket_name: str, region: str = None) -> bool:
     try:
         if region is None:
             s3 = get_s3_client()
-            s3.create_bucket(Bucket=bucket_name)
+            s3.create(Bucket=bucket_name)
         else:
             s3 = get_s3_client(region=region)
             location = {'LocationConstraint': region}
@@ -35,12 +36,12 @@ def create_bucket(bucket_name: str, region: str = None) -> bool:
 
 def delete_bucket(bucket_name: str, region: str = None) -> bool:
     try:
-        s3 = get_s3_client(region=region)
+        s3 = get_s3_client(region="us")
         bucket_objects = list_objects(bucket_name)
         for obj in bucket_objects:
             s3.delete_object(Bucket=bucket_name, Key=obj['Key'])
         s3.delete_bucket(Bucket=bucket_name)
-    except (KeyError, ClientError) as e:
+    except s3 as e:
         logging.error("Bucket is empty")
         logging.error(e)
         return False
@@ -50,7 +51,7 @@ def delete_bucket(bucket_name: str, region: str = None) -> bool:
 def list_buckets() -> List[str]:
     try:
         s3_client = get_s3_client()
-        buckets = [bucket["Name"] for bucket in s3_client.list_buckets()["Buckets"]]
+        buckets = [bucket["Name"] for bucket in s3_client.list()["Buckets"]]
     except (KeyError, ClientError) as e:
         logging.error(e)
         return []
@@ -60,7 +61,7 @@ def list_buckets() -> List[str]:
 def list_objects(bucket_name: str) -> List[dict]:
     try:
         s3 = get_s3_client()
-        objects = s3.list_objects_v2(Bucket=bucket_name)["Contents"]
+        objects = s3.list_objects(Bucket=bucket_name)["Contents"]
     except (KeyError, ClientError) as e:
         logging.error(e)
         return []

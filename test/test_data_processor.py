@@ -8,7 +8,7 @@ import json
 import s3_api as s3
 import dynamodb_api as db
 import logging
-from data_processor import process
+from data_processor import processssss
 
 
 @pytest.fixture

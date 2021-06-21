@@ -40,6 +40,8 @@ docker network inspect build
 docker network connect multi-host-network <container_id>
 docker-compose up -d --no-deps --build <service_name>
 docker exec -it <container_id> /bin/sh
+docker-compose exec <service> bash
+docker-compose logs -f <service>
 docker run --rm --env LOCALSTACK_HOSTNAME=172.17.0.2 -p 9001:8080 466dbb6b1517<container_id>
 
 # DynamoDB:
