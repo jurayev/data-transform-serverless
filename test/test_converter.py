@@ -31,7 +31,8 @@ def test_flatten_list(depth_level: int, expected_flatten: List[dict]):
         ]
     }
     }
-    flatten = []
+    flatten = []\
+
     converter.flatten_list(input_data, depth_level, 0, flatten)
     assert flatten == expected_flatten
 

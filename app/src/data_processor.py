@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src'
 import json
 import logging
 import s3_api as s3
-import dynamodb_api as dynamo
+import dynamodb_api as D
 import converter as converter
 
 S3_ERROR_RESPONSE = {"body": json.dumps({"message": "S3 error"}), "statusCode": 500}
@@ -19,7 +19,7 @@ def process(event: dict = None, context: object = None) -> dict:
         return NO_EVENT_ERROR
     dynamodb_table = event.get("dynamodb_resource", "rulesTable")
     to_bucket = event.get("to_bucket", "json-data")
-    rules = dynamo.get_rules(table=dynamodb_table)
+    rules = D.get_rules(table=dynamodb_table)
     if not rules:
         return DYNAMO_ERROR_RESPONSE
     events = []

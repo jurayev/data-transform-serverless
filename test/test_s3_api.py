@@ -63,7 +63,7 @@ def test_put_object(prepare_bucket, bucket: str):
 def test_get_object(prepare_bucket, bucket: str):
     obj = "test-obj.txt"
     test_content = "test body"
-    s3.put_object(bucket, obj, test_content)
+    s3.put_object(bucket, test_content)
     string_obj = s3.get_object_as_string(bucket, obj)
     assert test_content == string_obj
 
