@@ -12,6 +12,7 @@ def xml_to_json(xml: str, rules: dict) -> str:
     raw_dict = xmltodict.parse(xml, process_namespaces=True, namespaces=namespaces)
     dictionary = convert(raw_dict, rules)
     json_string = json.dumps(dictionary, indent=4)
+
     return json_string
 
 
